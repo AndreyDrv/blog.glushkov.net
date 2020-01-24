@@ -1,4 +1,4 @@
-## How to build Tensorflow from the source, the shortcut
+## How to build Tensorflow from the source, the shortcuts / Build Tensorflow for the older CPU / Tensorflow build Troubleshooting
 
 #### 1. Setup build environment
 
@@ -17,7 +17,7 @@ docker run -it -w /tensorflow -v D:\Share:/share tensorflow/tensorflow:devel-py3
 #### 2. Get the latest tensorflow version and finish environment setup
 Inside the container or local folder (if instead step 1 the environment was set up manually)
 
-```shell
+```bash
 cd /tensorflow_src/
 git pull
 git checkout r2.1
@@ -78,9 +78,25 @@ Run on the target PC/CPU
 grep flags -m1 /proc/cpuinfo | cut -d ":" -f 2 | tr '[:upper:]' '[:lower:]' | { read FLAGS; OPT="-march=native"; for flag in $FLAGS; do case "$flag" in "sse4_1" | "sse4_2" | "ssse3" | "fma" | "cx16" | "popcnt" | "avx" | "avx2") OPT+=" -m$flag";; esac; done; MODOPT=${OPT//_/\.}; echo "$MODOPT"; }
 ```
 The output will be in the format `-march=native -mssse3 -mcx16 -msse4.1 -msse4.2 -mpopcnt`
+CPU instructions could be also disabled.
+The full flags list is [here](https://gcc.gnu.org/onlinedocs/gcc-4.5.3/gcc/i386-and-x86_002d64-Options.html)
 
-The flags list is 
+#### 4. Build with bazel for the target CPU
+Using the flags from step 3 assembling the build line
 
+Example with overriding the march flag
+```shell
+bazel build --copt=-march=silvermont //tensorflow/tools/pip_package:build_pip_package
+```
+
+Example with forced and restricted flags
+```shell
+bazel build --config=opt --copt=-mssse3 --copt=-mcx16 --copt=-msse4.1 --copt=-msse4.2 --copt=-mpopcnt --copt=-mno-fma4 --copt=-mno-avx --copt=-mno-avx2 //tensorflow/tools/pip_package:build_pip_package
+```
+
+#### 5. Wrap the binaries with python setup wheel file
+
+./bazel-bin/tensorflow/tools/pip_package/build_pip_package /share/tf_compile/tensorflow_src/compiled/
 
 
 #### Troubleshooting
@@ -95,6 +111,19 @@ Download the installation script for the required version and platform and insta
 ```
 sudo apt install ./bazel_1.2.1-linux-x86_64.deb
 ```
+
+###### Avoid errors like 'CXXABI_1.3.11' not found
+
+Add the parameter to the build line to enable compatability with older GCC
+```
+bazel build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" ...
+```
+
+If the file was already compiled, need a quick fix just copy `/usr/lib/x86_64-linux-gnu/libstdc++.so.6` file from tensorflow development docker container (from step 1) to the target PC environment to the same path `/usr/lib/x86_64-linux-gnu/` or `/usr/lib64` depending on the target system.
+
+
+
+
 
 
 
