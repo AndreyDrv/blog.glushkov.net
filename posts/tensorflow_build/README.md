@@ -154,14 +154,3 @@ bazel build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" ...
 ###### Illegal instruction Tensorflow error after running
 The build flags were not properly selected / skipped - the compiled binaries and the target CPU does not match
 Try to refine `-march` flag; disable unsupported instructions ex:`-mno-avx`, etc at step 4.
-
-
-
-
-<script src="https://utteranc.es/client.js"
-        repo="blog.glushkov.net"
-        issue-term="title"
-        theme="photon-dark"
-        crossorigin="anonymous"
-        async>
-</script>
