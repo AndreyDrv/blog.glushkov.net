@@ -1,6 +1,6 @@
 ## How to build Tensorflow from the source, the shortcut
 
-1. Setup build environment
+#### 1. Setup build environment
 
 - Download tensorflow docker development image
 
@@ -14,7 +14,7 @@ docker pull tensorflow/tensorflow:devel-py3
 docker run -it -w /tensorflow -v D:\Share:/share tensorflow/tensorflow:devel-py3 bash
 ```
 
-2. Get the latest tensorflow version and finish environment setup
+#### 2. Get the latest tensorflow version and finish environment setup
 Inside the container or local folder (if instead step 1 the environment was set up manually)
 
 ```shell
@@ -31,7 +31,7 @@ pip3 install keras_applications==1.0.6 --no-deps
 pip3 install keras_preprocessing==1.0.5 --no-deps
 ```
 
-3. Configure bazel for the target CPU
+#### 3. Configure bazel / understand flags for the target CPU
 
 ```shell
 python configure.py
@@ -65,15 +65,36 @@ Please specify optimization flags to use during compilation when bazel option "-
 Would you like to interactively configure ./WORKSPACE for Android builds? [y/N]:
 Not configuring the WORKSPACE for Android builds.
 ```
-``march=silvermont`` for Celeron Bay Trail CPU
+`-march=silvermont` for Celeron Bay Trail CPU
+
+*(info)* To get the CPU code for gcc:
+```shell
+cat /sys/devices/cpu/caps/pmu_name
+```
+
+*(info)* To get the flags list only if the CPU code is wrong or does not work as expected:
+Run on the target PC/CPU
+```
+grep flags -m1 /proc/cpuinfo | cut -d ":" -f 2 | tr '[:upper:]' '[:lower:]' | { read FLAGS; OPT="-march=native"; for flag in $FLAGS; do case "$flag" in "sse4_1" | "sse4_2" | "ssse3" | "fma" | "cx16" | "popcnt" | "avx" | "avx2") OPT+=" -m$flag";; esac; done; MODOPT=${OPT//_/\.}; echo "$MODOPT"; }
+```
+The output will be in the format `-march=native -mssse3 -mcx16 -msse4.1 -msse4.2 -mpopcnt`
+
+The flags list is 
 
 
 
+#### Troubleshooting
+###### Bazel is not the right version / update Bazel
 
+Download the installation script for the required version and platform and install
+```
+./bazel-1.2.1-installer-linux-x86_64.sh
+```
 
-
-
-
+*!* Installation of the deb file does not work from the box as need to reassign binary shotcuts versions.
+```
+sudo apt install ./bazel_1.2.1-linux-x86_64.deb
+```
 
 
 
