@@ -65,9 +65,9 @@ Please specify optimization flags to use during compilation when bazel option "-
 Would you like to interactively configure ./WORKSPACE for Android builds? [y/N]:
 Not configuring the WORKSPACE for Android builds.
 ```
-`-march=silvermont` for Celeron Bay Trail CPU
+`-march=silvermont` for Celeron Bay Trail Silvermont CPU
 
-*(info)* To get the CPU code for gcc:
+*(info)* To get the CPU microarchitecture code for gcc:
 ```shell
 cat /sys/devices/cpu/caps/pmu_name
 ```
@@ -154,3 +154,6 @@ bazel build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" ...
 ###### Illegal instruction Tensorflow error after running
 The build flags were not properly selected / skipped - the compiled binaries and the target CPU does not match
 Try to refine `-march` flag; disable unsupported instructions ex:`-mno-avx`, etc at step 4.
+
+
+Thats all folks!
