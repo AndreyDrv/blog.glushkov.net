@@ -81,7 +81,7 @@ The output will be in the format `-march=native -mssse3 -mcx16 -msse4.1 -msse4.2
 CPU instructions could be also disabled.
 The full flags list is [here](https://gcc.gnu.org/onlinedocs/gcc-4.5.3/gcc/i386-and-x86_002d64-Options.html)
 
-#### 4. Build with bazel for the target CPU
+#### 4. Build with bazel for the target CPU (~3,5h docker 8GB RAM 4 CPU)
 Using the flags from step 3 assembling the build line
 
 Example with overriding the march flag
@@ -96,7 +96,30 @@ bazel build --config=opt --copt=-mssse3 --copt=-mcx16 --copt=-msse4.1 --copt=-ms
 
 #### 5. Wrap the binaries with python setup wheel file
 
+Generate wheel file to the shared directory
+```
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /share/tf_compile/tensorflow_src/compiled/
+```
+
+Now the setup file ex:`tensorflow-2.1.0-cp36-cp36m-linux_x86_64.whl` is ready to be installed / deployed on the target environment.
+
+
+#### 6. Install Tensorflow and verify with hello-world example
+
+Ex:
+```
+python3.6 -m pip install /tensorflow-2.1.0-cp36-cp36m-linux_x86_64.whl
+```
+
+Verify Tensorflow is working (v2.XX)
+```
+python3.6 -c "import tensorflow as tf; msg = tf.constant('TensorFlow 2.0 Hello World'); tf.print(msg)"
+```
+
+Verify Tensorflow is working (v1.XX)
+```
+python3.6 -c "from __future__ import print_function; import tensorflow as tf; hello = tf.constant('Hello, TensorFlow!'); sess = tf.Session(); print(sess.run(hello))"
+```
 
 
 #### Troubleshooting
@@ -112,17 +135,25 @@ Download the installation script for the required version and platform and insta
 sudo apt install ./bazel_1.2.1-linux-x86_64.deb
 ```
 
-###### Avoid errors like 'CXXABI_1.3.11' not found
+###### Avoid errors like 'CXXABI_1.3.11' not found when Tensorflow is successfully installed by fail to run
 
-Add the parameter to the build line to enable compatability with older GCC
+To check if the target has the required API version ex:`CXXABI_1.3.11`
+```
+strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep CXXABI
+```
+If the `1.3.11` is missing, do one of the following steps:
+
+- Add the parameter to the build line to enable compatability with older GCC
 ```
 bazel build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" ...
 ```
 
-If the file was already compiled, need a quick fix just copy `/usr/lib/x86_64-linux-gnu/libstdc++.so.6` file from tensorflow development docker container (from step 1) to the target PC environment to the same path `/usr/lib/x86_64-linux-gnu/` or `/usr/lib64` depending on the target system.
+- If the file was already compiled and the platform is matching, need a quick fix just copy `/usr/lib/x86_64-linux-gnu/libstdc++.so.6` file from tensorflow development docker container (from step 1) to the target PC environment to the same path `/usr/lib/x86_64-linux-gnu/` or `/usr/lib64` depending on the target system.
 
 
-
+###### Illegal instruction Tensorflow error after running
+The build flags were not properly selected / skipped - the compiled binaries and the target CPU does not match
+Try to refine `-march` flag; disable unsupported instructions ex:`-mno-avx`, etc at step 4.
 
 
 
