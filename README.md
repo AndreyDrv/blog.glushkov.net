@@ -1,4 +1,4 @@
-![Image](src)
+![Image](https://i.pinimg.com/originals/a0/2d/03/a02d03a01afa19720a22cc3dbc17407e.jpg)
 
 ## Welcome
 
@@ -9,7 +9,7 @@ My name is Andrey, I am Data Scientist / Data Solutions Architect. I use this pl
 ### Compiling Tensorflow 2.XX from source
 
 This is the preview text
-* [Read More](Posts/tensorflow_build/README.md)
+* [Read More](posts/tensorflow_build)
 
 ## Support or Contact
 
