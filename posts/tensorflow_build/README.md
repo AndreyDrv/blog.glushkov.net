@@ -125,7 +125,9 @@ python3.6 -c "from __future__ import print_function; import tensorflow as tf; he
 #### Troubleshooting
 ###### Bazel is not the right version / update Bazel
 
-Download the installation script for the required version and platform and install
+Download the binary [installer](https://github.com/bazelbuild/bazel/releases) or [any other way](https://docs.bazel.build/versions/master/install-ubuntu.html) for the required version and platform
+
+Inside the docker container:
 ```
 ./bazel-1.2.1-installer-linux-x86_64.sh
 ```
